@@ -1,0 +1,13 @@
+# Ignora todo por defecto
+/*
+# Permite ver estas carpetas y archivos en la raiz
+!Data/
+!scripts/
+!.gitignore
+!README*
+# Dentro de Data, ignora todo (incluyendo Procesed-based y su contenido)
+Data/*
+# Dentro de scripts, ignora todo excepto estos dos archivos
+scripts/*
+!scripts/1_import.r
+!scripts/2_cleaning.r
