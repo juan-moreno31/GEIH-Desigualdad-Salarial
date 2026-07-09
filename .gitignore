@@ -3,6 +3,7 @@
 # Permite ver estas carpetas y archivos en la raiz
 !Data/
 !scripts/
+!Resultados/
 !.gitignore
 !README*
 # Dentro de Data, ignora todo (incluyendo Procesed-based y su contenido)
@@ -14,3 +15,4 @@ Data/Procesed-based/*
 scripts/*
 !scripts/1_import.r
 !scripts/2_cleaning.r
+!scripts/EDA.r
