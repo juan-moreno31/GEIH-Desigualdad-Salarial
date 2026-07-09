@@ -24,19 +24,18 @@ meses_anio <- paste(meses, anio)  # "Enero 2025", "Febrero 2025", ...
 #########################################################################################
 # Esta es la unica ruta que hay que cambiar si se quiere correr el script en otra computadora
 
-ruta_zips <- "C:\\Users\\diego\\Documents\\GEIH-Desigualdad-Salarial\\Data"
-ruta_extraccion <- "C:\\Users\\diego\\Documents\\GEIH-Desigualdad-Salarial\\Data\\GEIH-Zip-opened"
+ruta_zips <- "Data"
+ruta_extraccion <- "Data/GEIH-Zip-opened"
 
 #########################################################################################
 
 # listas donde vamos a ir guardando cada mes de cada modulo
 lista_ocupados        <- list()
 lista_caracteristicas <- list()
-lista_vivienda        <- list()
 
 # ============================================================
-# Ciclo: descomprimir cada zip y leer los 3 modulos que nos sirven
-# Solo usamos los CSV ocupados, caracteristicas generales y vivienda, que son los que nos interesan
+# Ciclo: descomprimir cada zip y leer los modulos que nos sirven
+# Solo usamos los CSV ocupados y caracteristicas generales, que son los que nos interesan
 # ============================================================
 
 for (mes in meses_anio) {
@@ -72,7 +71,6 @@ for (mes in meses_anio) {
   # identificamos cual archivo es cada modulo
   archivo_ocupados <- archivos_csv[grepl("^Ocupados", basename(archivos_csv), ignore.case = TRUE)]
   archivo_caract   <- archivos_csv[grepl("Caracter", basename(archivos_csv), ignore.case = TRUE)]
-  archivo_vivienda <- archivos_csv[grepl("vivienda", basename(archivos_csv), ignore.case = TRUE)]
 
   # ---- leemos cada uno con read_csv2 (separador ";", como vienen los csv del DANE) ----
   # col_types = cols(.default = "c") fuerza que TODO se lea como texto,
@@ -94,14 +92,6 @@ for (mes in meses_anio) {
     df$mes <- mes
     lista_caracteristicas[[mes]] <- df
   }
-
-  if (length(archivo_vivienda) > 0) {
-    df <- read_csv2(archivo_vivienda[1], show_col_types = FALSE,
-                     locale = locale(encoding = "latin1"),
-                     col_types = cols(.default = "c"))
-    df$mes <- mes
-    lista_vivienda[[mes]] <- df
-  }
 }
 
 # ============================================================
@@ -110,42 +100,31 @@ for (mes in meses_anio) {
 
 ocupados             <- bind_rows(lista_ocupados)
 caracteristicas_gral <- bind_rows(lista_caracteristicas)
-vivienda             <- bind_rows(lista_vivienda)
 
 # revisamos que quedo bien
 nrow(ocupados)
 nrow(caracteristicas_gral)
-nrow(vivienda)
 
 names(ocupados)  # ahora deberian verse las columnas separadas, no un solo string
 
 # ============================================================
-# Unimos los 3 modulos en un solo dataframe
+# Unimos los 2 modulos en un solo dataframe
 # ============================================================
 
-# 1. Ocupados + Caracteristicas generales (nivel persona)
-base_personas <- caracteristicas_gral %>%
+# Ocupados + Caracteristicas generales (nivel persona)
+base_final <- ocupados |>
   left_join(
-    ocupados,
+    caracteristicas_gral,
     by = c("DIRECTORIO", "SECUENCIA_P", "ORDEN", "mes"),
-    suffix = c("", "_ocup")
+    suffix = c("_ocup", "")
   )
-
-# 2. + Vivienda (nivel hogar)
-base_final <- base_personas %>%
-  left_join(
-    vivienda,
-    by = c("DIRECTORIO", "SECUENCIA_P", "mes"),
-    suffix = c("", "_viv")
-  )
-
 # revisamos
-nrow(base_final)
-names(base_final)
-
+# nrow(ocupados)
+# nrow(base_final)
+ 
 # ============================================================
 # descargamos el resultado final en un csv 
 # ============================================================
 # la ruta donde se quiera guardar puede cambiarse.
 write_csv(base_final,
-          "C:\\Users\\diego\\Documents\\GEIH-Desigualdad-Salarial\\Data\\Procesed-based\\union_base.csv")
+          "Data/Procesed-based/union_base.csv")
