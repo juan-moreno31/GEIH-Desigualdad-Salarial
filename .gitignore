@@ -7,6 +7,9 @@
 !README*
 # Dentro de Data, ignora todo (incluyendo Procesed-based y su contenido)
 Data/*
+!Data/Procesed-based/
+Data/Procesed-based/*
+!Data/Procesed-based/cleaned_base.csv
 # Dentro de scripts, ignora todo excepto estos dos archivos
 scripts/*
 !scripts/1_import.r
