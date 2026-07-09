@@ -15,4 +15,4 @@ Data/Procesed-based/*
 scripts/*
 !scripts/1_import.r
 !scripts/2_cleaning.r
-!scripts/EDA.r
+!scripts/3_EDA.r
