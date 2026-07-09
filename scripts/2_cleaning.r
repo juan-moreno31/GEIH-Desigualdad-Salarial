@@ -27,20 +27,15 @@ df <- read_csv("C:\\Users\\diego\\Documents\\GEIH-Desigualdad-Salarial\\Data\\Pr
 # revisamos la estructura de la base de datos
 
 head(df)
-
 # 2) Seleccionamos las columnas que nos interesan para el análisis
-
 df <- df |> select(
   P3271, P6040, P3042, P6500, P6800,
   RAMA2D_R4, P6426, P6090, P6920, P6780,
-  DPTO, P3069, P3065, P6775, P6430
+  P3069, P3065, P6775, P6430
 )
 
 df <- df |> filter(
-  !is.na(P3271) & !is.na(P6040) & !is.na(P3042) &
-  !is.na(P6800) & 
-  !is.na(RAMA2D_R4) & !is.na(P6426) & !is.na(P6090) &
-  !is.na(P6920) & !is.na(DPTO) & !is.na(P3069) & !is.na(P6430)
+  !is.na(P3271), !is.na(P6040), !is.na(P3042)
 )
 
 # 4) Trasformamos los nombres de las columnas para que sean más descriptivos
@@ -54,7 +49,6 @@ df <- df |> rename(
   Tiempo_empresa = P6426,
   Afi_salud = P6090,
   afi_pension = P6920,
-  departamento = DPTO,
   Tipo_de_trabajo = P6780,
   Num_trabajdores_empresa = P3069,
   camara_comercio = P3065,
@@ -64,13 +58,14 @@ df <- df |> rename(
 
 # 5) Creamos las variables de interés para el análisis
 
-# 5.1) Creamos la variable de ingreso por hora y convertimos tiempo en empresa a años
+# 5.1) Creamos la variable de ingreso por hora, convertimos tiempo en empresa a años y sexo a dummy 0/1 (Mujer = 1, Hombre = 0)
 df <- df |>
   mutate(
     ingreso_hora = as.numeric(Salario_mensual) / (as.numeric(horas_trabajo) * 4.33),
-    Tiempo_empresa = as.numeric(Tiempo_empresa) / 12
+    Tiempo_empresa = as.numeric(Tiempo_empresa) / 12,
+    sexo = if_else(sexo == "2", 1L, 0L)
   ) |>
-  filter(!is.na(ingreso_hora)) |>
+  filter(!is.na(ingreso_hora), ingreso_hora > 0) |>
   select(-Salario_mensual, -horas_trabajo)
 
 # 5.2) Creamos la variable de informalidad
@@ -100,6 +95,27 @@ df <- df |>
 df <- df |>
   select(-c(Afi_salud, afi_pension, camara_comercio, contabilidad, 
             Num_trabajdores_empresa, posicion_ocupacional, Tipo_de_trabajo))
+
+# 5.4) Estandarizamos las variables categóricas creando nuevas columnas con nombres
+df <- df |>
+  mutate(
+    # Nivel educativo (Mantenemos la original y creamos nivel_educativo_nombre)
+    nivel_educativo_nombre = case_when(
+      nivel_educativo %in% c("1", "2") ~ "Sin educación",
+      nivel_educativo %in% c("3", "4") ~ "Primaria",
+      nivel_educativo %in% c("5", "6", "7", "8") ~ "Secundaria",
+      nivel_educativo %in% c("9") ~ "Técnico",
+      nivel_educativo %in% c("10") ~ "Tecnólogo",
+      nivel_educativo %in% c("11", "12") ~ "Profesional",
+      nivel_educativo %in% c("13") ~ "Posgrado",
+      TRUE ~ "Otro"
+    ),
+    nivel_educativo_nombre = factor(
+      nivel_educativo_nombre, 
+      levels = c("Sin educación", "Primaria", "Secundaria", "Técnico", "Tecnólogo", "Profesional", "Posgrado"),
+      ordered = TRUE
+    )
+  )
 
 # 6) Guardamos la base de datos limpia
 write_csv(df, "C:\\Users\\diego\\Documents\\GEIH-Desigualdad-Salarial\\Data\\Procesed-based\\cleaned_base.csv")
