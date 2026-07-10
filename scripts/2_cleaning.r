@@ -114,7 +114,26 @@ df <- df |>
       nivel_educativo_nombre, 
       levels = c("Sin educación", "Primaria", "Secundaria", "Técnico", "Tecnólogo", "Profesional", "Posgrado"),
       ordered = TRUE
-    )
+    ),
+    # Agrupar rama de actividad en sectores amplios para robustez y evitar singularidad en cuantiles
+    rama_actividad = case_when(
+      rama_actividad %in% c("01", "02", "03") ~ "1_Agricultura_Ganaderia",
+      rama_actividad %in% c("05", "06", "07", "08", "09") ~ "2_Mineria",
+      as.numeric(rama_actividad) >= 10 & as.numeric(rama_actividad) <= 33 ~ "3_Manufactura",
+      as.numeric(rama_actividad) >= 35 & as.numeric(rama_actividad) <= 39 ~ "4_Servicios_Publicos",
+      as.numeric(rama_actividad) >= 41 & as.numeric(rama_actividad) <= 43 ~ "5_Construccion",
+      as.numeric(rama_actividad) >= 45 & as.numeric(rama_actividad) <= 47 ~ "6_Comercio",
+      as.numeric(rama_actividad) >= 49 & as.numeric(rama_actividad) <= 53 ~ "7_Transporte",
+      as.numeric(rama_actividad) >= 55 & as.numeric(rama_actividad) <= 56 ~ "8_Alojamiento_Comida",
+      as.numeric(rama_actividad) >= 58 & as.numeric(rama_actividad) <= 63 ~ "9_Informacion_Comunicaciones",
+      as.numeric(rama_actividad) >= 64 & as.numeric(rama_actividad) <= 66 ~ "10_Sector_Financiero",
+      as.numeric(rama_actividad) >= 68 & as.numeric(rama_actividad) <= 82 ~ "11_Inmobiliario_Profesional_Admin",
+      rama_actividad == "84" ~ "12_Administracion_Publica",
+      as.numeric(rama_actividad) >= 85 & as.numeric(rama_actividad) <= 88 ~ "13_Educacion_Salud",
+      as.numeric(rama_actividad) >= 90 & as.numeric(rama_actividad) <= 99 ~ "14_Otros_Servicios",
+      TRUE ~ "15_No_Informa"
+    ),
+    rama_actividad = factor(rama_actividad)
   )
 
 # 6) Guardamos la base de datos limpia

@@ -16,3 +16,4 @@ scripts/*
 !scripts/1_import.r
 !scripts/2_cleaning.r
 !scripts/3_EDA.r
+!scripts/4_modeloEconometrico.r
