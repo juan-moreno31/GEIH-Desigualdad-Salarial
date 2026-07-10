@@ -4,6 +4,7 @@
 !Data/
 !scripts/
 !Resultados/
+!Reporte/
 !.gitignore
 !README*
 # Dentro de Data, ignora todo (incluyendo Procesed-based y su contenido)
@@ -11,9 +12,16 @@ Data/*
 !Data/Procesed-based/
 Data/Procesed-based/*
 !Data/Procesed-based/cleaned_base.csv
-# Dentro de scripts, ignora todo excepto estos dos archivos
+# Dentro de scripts, ignora todo excepto estos archivos
 scripts/*
 !scripts/1_import.r
 !scripts/2_cleaning.r
 !scripts/3_EDA.r
 !scripts/4_modeloEconometrico.r
+!scripts/5_modeloIA.ipynb
+# Dentro de Reporte, permite los archivos principales
+Reporte/*
+!Reporte/Reporte.qmd
+!Reporte/Reporte.pdf
+!Reporte/Reporte.md
+!Reporte/references.bib
